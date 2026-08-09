@@ -1,0 +1,14 @@
+# Jac
+.jac/
+__jac_gen__/
+*.jir
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
