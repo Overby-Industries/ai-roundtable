@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Overby-Industries/ai-roundtable/schemas/advisory-recommendation.schema.json",
   "title": "ADV-1 advisory recommendation",
-  "description": "The roundtable's answer to an advisory request. It is a proposal for human review, never a command: requiresHumanApproval is fixed true, and the original request's defaultChoice applies if nobody approves in time.",
+  "description": "The roundtable's answer to an advisory request. It is a proposal for human review, never a command: requiresHumanApproval is fixed true, and the original request's defaultChoice applies if nobody approves in time. `process` records how the recommendation was reached, so a reviewer can tell a real majority from a fallback to the default; tools/validate.py re-derives the outcome from `votes` and `process` and rejects a recommendation they do not support.",
   "type": "object",
-  "required": ["version", "kind", "timestamp", "requestId", "recommendation", "summary", "risks", "votes", "requiresHumanApproval"],
+  "required": ["version", "kind", "timestamp", "requestId", "recommendation", "summary", "risks", "votes", "process", "requiresHumanApproval"],
   "additionalProperties": false,
   "properties": {
     "version": { "const": "ADV-1" },
@@ -17,15 +17,14 @@
     "recommendation": {
       "type": "string",
       "minLength": 1,
-      "description": "The options[].id the roundtable proposes."
+      "description": "The options[].id the roundtable proposes. Always one of the request's options: the roundtable chooses among what the requester enumerated and cannot invent an action."
     },
     "summary": { "type": "string", "minLength": 1 },
     "risks": { "type": "array", "items": { "type": "string" } },
     "nextActions": { "type": "array", "items": { "type": "string" } },
     "votes": {
       "type": "object",
-      "minProperties": 1,
-      "description": "Keyed by agent role, e.g. 'Safety Officer'.",
+      "description": "Valid votes only, keyed by agent role, e.g. 'Safety Officer'. A role whose vote was missing or invalid appears under process.abstained instead.",
       "additionalProperties": {
         "type": "object",
         "required": ["choice", "confidence"],
@@ -34,6 +33,45 @@
           "choice": { "type": "string", "minLength": 1 },
           "rationale": { "type": "string" },
           "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "description": "How the recommendation was reached.",
+      "required": ["basis", "rounds", "participants"],
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["unanimous", "plurality", "tie-default", "no-quorum-default", "safety-block-default"],
+          "description": "unanimous / plurality: the vote winner is recommended. tie-default: first place was tied. no-quorum-default: no more than half of the participants cast a valid vote. safety-block-default: the vote winner was flagged unsafe by the safety critic. The last three always recommend the request's defaultChoice."
+        },
+        "rounds": { "type": "integer", "minimum": 1, "description": "Deliberation rounds completed." },
+        "participants": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Every role seated for the session. Each appears exactly once in votes or in abstained."
+        },
+        "abstained": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "role": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "notes": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "type": "string" },
+          "description": "Process events a reviewer may want to know about, e.g. a role whose call failed in an earlier round."
         }
       }
     },

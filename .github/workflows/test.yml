@@ -8,6 +8,7 @@ on:
 
 jobs:
   advisory-schemas:
+    name: ADV-1 schemas and examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,4 +17,28 @@ jobs:
           python-version: "3.x"
       - run: pip install pytest jsonschema
       - run: python tools/validate.py
-      - run: python -m pytest -q
+      - run: python -m pytest -q tests/test_advisory.py
+
+  roundtable-engine:
+    name: Jac roundtable engine
+    runs-on: ubuntu-latest
+    env:
+      # Lets jac check/test resolve `roundtable.*` (see README).
+      PYTHONPATH: jac
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pip install -r jac/requirements.txt
+      - name: Type-check the engine and the CLI
+        # Separately: given together, jac check treats one Roster type as two.
+        run: |
+          jac check jac/roundtable
+          jac check jac/roundtable_cli.jac
+      - name: Native Jac tests (vote rule, clipping)
+        run: |
+          jac test jac/roundtable/tally.jac
+          jac test jac/roundtable/digest.jac
+      - name: End-to-end tests against scripted models (no network, no API keys)
+        run: python -m pytest -q tests/test_roundtable_engine.py

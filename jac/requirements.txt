@@ -1,0 +1,7 @@
+# Versions the roundtable engine was built and tested against.
+jaclang~=0.16.7
+byllm~=0.6.19
+
+# Contract validation and tests.
+jsonschema>=4.23
+pytest>=8

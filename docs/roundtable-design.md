@@ -102,11 +102,30 @@ not a final answer.
   community-gamification features (contributors, badges, awards). Neither
   is relevant to fleet decision support.
 
-## Not built yet
+## Status: built, and where it differs from the design above
 
-Everything in this document. The current `.jac` code in this repo (see
-`jac/`) is the migrated prototype's simpler single-agent chat graph --
-useful as a working Jaseci reference and a base to build on, but it does
-not implement `RoundtableSession`, multi-round deliberation, critique, or
-voting. That's the next phase of work, not something this repo claims to
-already do.
+The engine in `jac/roundtable/` implements the graph model, rounds, the
+critique phase, the vote and the summary. It has been exercised only against
+scripted models, not a live provider. See [`adv1.md`](adv1.md) for how it
+behaves. Where it deliberately departs from the sketch above:
+
+- **Agents choose among the request's options; they do not invent proposals.**
+  The ADV-1 request enumerates the options, so there is no consolidation or
+  de-duplication step, and nothing an agent writes can become an action the
+  requester did not list.
+- **The vote is decided by a deterministic tally, not by a model.** Quorum,
+  a confidence tie-break, and a fallback to the request's default are fixed
+  rules (`tally.jac`), re-derived independently by `adv1_contract.py`.
+- **The Safety Officer can block, but only toward the default.** A flagged
+  winner is replaced by the requester's default; the critic cannot push the
+  outcome to any other option.
+- **The summary is partly deterministic.** Its first sentence is built from
+  the tally; a model's prose follows it.
+- **A session is a detached, per-run graph.** It is not attached to Jac's
+  `root`, so no request or answer is persisted between runs.
+- **Roles live in a roster file** (`config/roster.example.json`), as designed,
+  with an optional `topics` list per role to pick who sits on which question.
+
+Still open: running against live providers and tuning the prompts, a reviewed
+role set (the roles in the example roster are placeholders), serving the engine
+(`jac serve`), and a path for a human approval to flow back to the requester.

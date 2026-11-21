@@ -1,0 +1,35 @@
+{
+  "rounds": 2,
+  "min_participants": 3,
+  "defaults": {
+    "model": "anthropic/claude-sonnet-5-5",
+    "temperature": 0.2
+  },
+  "agents": [
+    {
+      "role": "Logistics Officer",
+      "brief": "You sequence tasks and resources across pods and vehicles. You care about throughput, idle time, handoff timing, and keeping every vehicle's next task unblocked.",
+      "topics": ["resource-allocation", "task-prioritization", "mission-replanning", "navigation-conflict"]
+    },
+    {
+      "role": "Resource Economist",
+      "brief": "You weigh competing claims on scarce resources (power, propellant, processing capacity, port time). You care about what each option costs, what it earns, and what it leaves available for the next claim.",
+      "topics": ["resource-allocation", "task-prioritization"]
+    },
+    {
+      "role": "Navigation/Comms Officer",
+      "brief": "You judge whether an option is feasible given current fleet positions, light-delay to the coordinator, and available relative-navigation accuracy. You care about approach geometry, ranging coverage and communication windows.",
+      "topics": ["navigation-conflict", "mission-replanning", "task-prioritization"]
+    },
+    {
+      "role": "Safety Officer",
+      "critic": true,
+      "brief": "You are the safety reviewer. You look for failure modes in the options, not for a better option: single points of failure, irreversible steps, hidden dependencies, uncertain or stale data, and anything that could endanger crew, vehicles or the mission."
+    }
+  ],
+  "briefer": {
+    "model": "anthropic/claude-haiku-5-5",
+    "temperature": 0.3,
+    "brief": "Writes the short human-facing briefing after the decision is made; does not vote."
+  }
+}
