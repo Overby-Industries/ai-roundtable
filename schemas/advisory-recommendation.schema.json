@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Overby-Industries/ai-roundtable/schemas/advisory-recommendation.schema.json",
+  "title": "ADV-1 advisory recommendation",
+  "description": "The roundtable's answer to an advisory request. It is a proposal for human review, never a command: requiresHumanApproval is fixed true, and the original request's defaultChoice applies if nobody approves in time.",
+  "type": "object",
+  "required": ["version", "kind", "timestamp", "requestId", "recommendation", "summary", "risks", "votes", "requiresHumanApproval"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": "ADV-1" },
+    "kind": { "const": "advisory-recommendation" },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "requestId": { "type": "string", "minLength": 1 },
+    "recommendation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The options[].id the roundtable proposes."
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "risks": { "type": "array", "items": { "type": "string" } },
+    "nextActions": { "type": "array", "items": { "type": "string" } },
+    "votes": {
+      "type": "object",
+      "minProperties": 1,
+      "description": "Keyed by agent role, e.g. 'Safety Officer'.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["choice", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "choice": { "type": "string", "minLength": 1 },
+          "rationale": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "requiresHumanApproval": { "const": true }
+  }
+}

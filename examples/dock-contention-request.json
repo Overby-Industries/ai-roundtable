@@ -1,0 +1,17 @@
+{
+  "version": "ADV-1",
+  "kind": "advisory-request",
+  "timestamp": "2026-11-21T12:00:00Z",
+  "source": { "id": "depot-1", "role": "node" },
+  "id": "depot-1-dock-A-B",
+  "topic": "resource-allocation",
+  "urgency": "deliberative",
+  "question": "Vehicles A and B have equal priority (5) for port P0; the default ordering delays B by 90 s. Is a different ordering better?",
+  "context": { "port": "P0", "priority": 5, "loserDelayS": 90 },
+  "options": [
+    { "id": "default", "summary": "A first (earliest ETA)" },
+    { "id": "swap", "summary": "B first" }
+  ],
+  "defaultChoice": "default",
+  "decideBy": "2026-11-21T13:00:00Z"
+}
