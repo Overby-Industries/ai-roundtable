@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Overby-Industries/ai-roundtable/schemas/advisory-request.schema.json",
+  "title": "ADV-1 advisory request",
+  "description": "A non-urgent fleet decision handed to the Tier 1 roundtable (see starlifter-os/docs/ai-advisory-layer-draft.md). Only deliberative questions belong here: anything time-critical is Tier 0 and must never be sent to this layer. The sender names a defaultChoice that applies if no human approves a recommendation by decideBy, so the fleet is never blocked on the roundtable.",
+  "type": "object",
+  "required": ["version", "kind", "timestamp", "source", "id", "topic", "urgency", "question", "options", "defaultChoice", "decideBy"],
+  "additionalProperties": false,
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "description": "RFC 3339 instant, same shape as OTF-1 timestamps."
+    }
+  },
+  "properties": {
+    "version": { "const": "ADV-1" },
+    "kind": { "const": "advisory-request" },
+    "timestamp": { "$ref": "#/$defs/timestamp" },
+    "source": {
+      "type": "object",
+      "required": ["id", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "enum": ["node", "coordinator"] }
+      }
+    },
+    "id": { "type": "string", "minLength": 1 },
+    "topic": {
+      "type": "string",
+      "enum": ["resource-allocation", "task-prioritization", "mission-replanning", "navigation-conflict"]
+    },
+    "urgency": {
+      "const": "deliberative",
+      "description": "Fixed value: this layer only accepts deliberative (minutes-to-hours) questions."
+    },
+    "question": { "type": "string", "minLength": 1 },
+    "context": {
+      "type": "object",
+      "description": "Free-form structured facts the agents may reason over (positions, inventories, schedules)."
+    },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "summary"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "defaultChoice": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must equal one options[].id (checked by tools/validate.py; JSON Schema cannot express it)."
+    },
+    "decideBy": { "$ref": "#/$defs/timestamp" }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "version": "ADV-1",
+  "kind": "advisory-recommendation",
+  "timestamp": "2026-11-21T12:20:00Z",
+  "requestId": "depot-1-dock-A-B",
+  "recommendation": "swap",
+  "summary": "B carries propellant the depot needs before the next eclipse; A can wait 90 s with no mission impact.",
+  "risks": ["B's arrival ETA is less certain than A's"],
+  "nextActions": ["Operator approves the swap before 13:00Z, or the default ordering stands"],
+  "votes": {
+    "Logistics Officer": { "choice": "swap", "rationale": "Propellant first", "confidence": 0.7 },
+    "Safety Officer": { "choice": "default", "rationale": "B's ETA is less certain", "confidence": 0.5 },
+    "Resource Economist": { "choice": "swap", "rationale": "Avoids eclipse power draw", "confidence": 0.8 }
+  },
+  "requiresHumanApproval": true
+}

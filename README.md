@@ -81,3 +81,7 @@ if you know it, this is a good repo to help with.
 ## License
 
 [Apache 2.0](LICENSE).
+
+## Fleet integration (ADV-1)
+
+The roundtable accepts non-urgent fleet questions as ADV-1 advisory requests and answers with a recommendation for human review. See `schemas/`, `examples/`, and `python tools/validate.py` (also checks cross-field rules like `defaultChoice` being a real option). Requests carry a `defaultChoice` that stands if no human approves in time, and recommendations are schema-locked to `requiresHumanApproval: true`. Producers: [`outpost-core`](https://github.com/Overby-Industries/outpost-core) today. **Not yet wired:** the Jac engine does not consume ADV-1 requests; the schemas fix that work's target.
